@@ -1,0 +1,37 @@
+# Name of the action
+name: Publish image to docker registry
+
+# On action (On a trigger)
+on:
+  [workflow_dispatch]
+
+# Will execute something. Jobs (Like a play in ansible)
+jobs:
+  runs-on: ubuntu-latest        # Image of the container that will be executing this job
+  generate_images:              # job ID
+    name: Building the images   # Name of the job (To appear on the Console)
+    step:
+      - name: Checkout my code into the workspaces
+        run: actions/checkout@v4
+
+      - name: Generate backend image
+        run: docker build -t marcodanyh11/qr-code-api:1.0.1 ./api
+
+      - name: Generate frontend image
+        run: docker build -t marcodanyh11/qr-code-project:1.0.1 ./front-end-nextjs
+
+  publish_images:
+    name: Publishing images on Docker hub
+    needs: [generate_images]
+    step:
+      - name: Login into Docker registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Publish the backend image
+        run: docker push marcodanyh11/qr-code-api:1.0.1
+
+      - name: Publish the frontend image
+        run: docker push marcodanyh11/qr-code-project:1.0.1
