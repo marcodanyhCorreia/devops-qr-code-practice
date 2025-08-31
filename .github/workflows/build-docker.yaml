@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest        # Image of the container that will be executing this job
     steps:
       - name: Checkout my code into the workspaces
-        run: actions/checkout@v4
+        uses: actions/checkout@v4
 
       - name: Generate backend image
         run: docker build -t marcodanyh11/qr-code-api:1.0.1 ./api
